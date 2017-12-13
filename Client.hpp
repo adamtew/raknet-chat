@@ -16,6 +16,11 @@ class GameClient
   public:
     GameClient();
     void Connect();
-    void GameSwitch(RakNet::Packet *packet, RakNet::RakPeerInterface *peer);
+    void GameSwitch();
+    void GetInput();
+
+  private:
+    RakNet::RakPeerInterface *peer;
+    RakNet::Packet *packet;
 };
 #endif // GameClient

@@ -6,7 +6,7 @@ LIB = -L./raknet/Lib/RakNetLibStatic/ -lRakNetLibStatic
 
 TARGET = chat
 OBJ_DIR = obj
-OBJS = main.o Server.o Client.o
+OBJS = main.o Server.o Client.o Common.o
 OBJ = $(patsubst %, $(OBJ_DIR)/%, $(OBJS))
 
 $(TARGET) : $(OBJS)

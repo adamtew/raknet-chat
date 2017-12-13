@@ -1,3 +1,4 @@
+// https://github.com/OculusVR/RakNet/blob/master/Samples/Chat%20Example/Chat%20Example%20Client.cpp
 #include <iostream>
 #include <stdio.h>
 #include "Client.hpp"
@@ -5,9 +6,10 @@
 
 GameClient::GameClient()
 {
+  peer = RakNet::RakPeerInterface::GetInstance();
 }
 
-void GameClient::GameSwitch(RakNet::Packet *packet, RakNet::RakPeerInterface *peer)
+void GameClient::GameSwitch()
 {
   switch (packet->data[0])
   {
@@ -32,17 +34,45 @@ void GameClient::GameSwitch(RakNet::Packet *packet, RakNet::RakPeerInterface *pe
   }
 }
 
+void GameClient::GetInput()
+{
+  if (_kbhit())
+  {
+    std::cout << "Hello Worlds\n";
+    char message[2048];
+    gets(message);
+
+    if (strcmp(message, "word") == 0)
+    {
+      printf("all kinda stuff\n");
+    }
+    else
+    {
+      //packet=peer->Receive();
+      //peer->DeallocatePacket(packet);
+      RakNet::BitStream bsOut;
+      bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+      bsOut.Write("Hello world");
+			//peer->Send(message, (int) strlen(message)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+      peer->Send(&bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, packet->systemAddress, false);
+      //peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
+      std::cout << message << " is not a recognized input\n";
+    }
+  }
+}
+
 void GameClient::Connect()
 {
-  RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
-  RakNet::Packet *packet;
   RakNet::SocketDescriptor sd;
   peer->Startup(1,&sd, 1);
   peer->Connect("127.0.0.1", SERVER_PORT, 0,0);
   while (1)
+  {
+    usleep(30 * 1000);
+    GetInput();
     for (packet=peer->Receive(); packet; peer->DeallocatePacket(packet), packet=peer->Receive())
-      usleep(30);
-      GameSwitch(packet, peer);
     {
+      GameSwitch();
+    }
   }
 }
